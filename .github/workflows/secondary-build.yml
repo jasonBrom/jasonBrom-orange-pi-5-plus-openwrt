@@ -6,6 +6,7 @@ on:
       artifact_url:
         description: '请输入压缩包的下载链接'
         required: true
+        default: 'https://example.com/path/to/your/artifact.tar.gz'
 
 jobs:
   secondary-build:
@@ -18,7 +19,7 @@ jobs:
 
       - name: Download Artifacts
         run: |
-          wget ${{ github.event.inputs.artifact_url }} -O build_artifacts.tar.gz
+          wget '${{ github.event.inputs.artifact_url }}' -O build_artifacts.tar.gz
           tar -xzvf build_artifacts.tar.gz
 
       - name: Setup Ubuntu
@@ -58,8 +59,17 @@ jobs:
           echo "DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
           echo "HASH=$(git log -1 --format="%H")" >> $GITHUB_ENV
 
+      - name: Install GitHub CLI
+        run: |
+          type -p curl >/dev/null || sudo apt install curl -y
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+
       - name: Delete Secondary Build Tag
-        run: gh release delete secondary-build-${{ env.DATE }} --cleanup-tag || true
+        run: gh release delete "secondary-build-${{ env.DATE }}" --yes || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,9 +78,9 @@ jobs:
         with:
           allowUpdates: true
           commit: ${{ env.HASH }}
-          name: Secondary Build OpenWrt ${{ env.DATE }}
-          tag: secondary-build-${{ env.DATE }}
+          name: "Secondary Build OpenWrt ${{ env.DATE }}"
+          tag: "secondary-build-${{ env.DATE }}"
           replacesArtifacts: true
           prerelease: true
           token: "${{ secrets.GITHUB_TOKEN }}"
-          artifacts: bin/targets/rockchip/armv8/*
+          artifacts: "bin/targets/rockchip/armv8/*"
