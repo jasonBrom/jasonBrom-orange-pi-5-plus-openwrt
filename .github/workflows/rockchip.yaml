@@ -11,7 +11,24 @@ jobs:
       - name: Setup Ubuntu
         run: |
           sudo apt update
-          sudo apt install -y python3 python3-pip python3-ply python3-distutils python3-pyelftools libpython3-dev swig
+          sudo apt install -y \
+            build-essential \
+            libncurses5-dev \
+            gawk \
+            git \
+            subversion \
+            libssl-dev \
+            gettext \
+            unzip \
+            zlib1g-dev \
+            file \
+            swig \
+            python3 \
+            python3-pip \
+            python3-ply \
+            python3-distutils \
+            python3-pyelftools \
+            libpython3-dev
 
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
@@ -58,14 +75,18 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a -f
           cp .github/workflows/rk-config .config
+
+          # 禁用 uboot-rockchip
+          sed -i '/CONFIG_PACKAGE_uboot-rockchip=y/d' .config
           make defconfig
+
           wget https://gist.githubusercontent.com/mj22226/9a69bb754a83e8a5cf03fcc60d62d473/raw/cc6f36831d6098de4a7fccf04a312d36a0dbc999/01-key.patch
           git apply 01-key.patch
           make download -j32
           rm 01-key.patch
 
-          # 编译并忽略错误
-          make -j$(nproc) 'IGNORE_ERRORS=n m'
+          # 编译并获取详细日志
+          make -j1 V=s
 
           # 清理无用文件
           rm -rf bin/targets/rockchip/armv8/packages
