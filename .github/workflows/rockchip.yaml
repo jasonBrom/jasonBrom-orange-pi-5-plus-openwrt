@@ -52,7 +52,6 @@ jobs:
 
           git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
           git clone https://github.com/qianlyun123/luci-app-modem.git package/luci-app-modem
-          git clone https://github.com/muink/luci-app-netspeedtest.git package/luci-app-netspeedtest
 
           cd feeds/luci
           wget https://gist.githubusercontent.com/mj22226/363cefecd314e45b49d8eafff8473fcf/raw/f327d1fcae5513be3abbeea1c6696c1da845a635/01-diskman.patch
