@@ -410,6 +410,19 @@ CONFIG_PACKAGE_kmod-veth=y
 CONFIG_PACKAGE_kmod-vxlan=y
 CONFIG_PACKAGE_kmod-wireguard=y
 CONFIG_PACKAGE_ksmbd-server=y
+#5g
+CONFIG_PACKAGE_kmod-usb-net-sierrawireless=y
+CONFIG_PACKAGE_kmod-usb-serial=y
+CONFIG_PACKAGE_kmod-usb-serial-wwan=y
+CONFIG_PACKAGE_kmod-usb-serial-option=y
+CONFIG_PACKAGE_kmod-usb-serial-qualcomm=y
+CONFIG_PACKAGE_kmod-usb-acm=y
+CONFIG_PACKAGE_kmod-usb-wdm=y
+CONFIG_PACKAGE_kmod-usb-net-qmi-wwan=y
+CONFIG_PACKAGE_kmod-usb-net-cdc-mbim=y
+CONFIG_PACKAGE_kmod-usb-net-huawei-cdc-ncm=y
+CONFIG_PACKAGE_kmod-lib-crc-ccitt=y
+
 
 CONFIG_PACKAGE_libaio=y
 CONFIG_PACKAGE_libassuan=y
@@ -532,6 +545,8 @@ CONFIG_PACKAGE_luci-mod-system=y
 CONFIG_PACKAGE_luci-proto-ipv6=y
 CONFIG_PACKAGE_luci-proto-ppp=y
 CONFIG_PACKAGE_luci-proto-wireguard=y
+
+CONFIG_PACKAGE_luci-theme-argon=y
 CONFIG_PACKAGE_luci-theme-bootstrap=y
 
 
@@ -543,7 +558,7 @@ CONFIG_PACKAGE_luci-app-modem=y
 CONFIG_PACKAGE_luci-i18n-modem-zh-cn=y
 CONFIG_PACKAGE_luci-app-sms-tool=y
 
-CONFIG_PACKAGE_luci-theme-argon=y
+
 
 
 CONFIG_PACKAGE_lvm2=y
