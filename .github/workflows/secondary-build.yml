@@ -1,0 +1,86 @@
+name: Secondary Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_url:
+        description: '请输入压缩包的下载链接'
+        required: true
+        default: 'https://example.com/path/to/your/artifact.tar.gz'
+
+jobs:
+  secondary-build:
+    name: Secondary Build OpenWrt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        run: |
+          wget '${{ github.event.inputs.artifact_url }}' -O build_artifacts.tar.gz
+          tar -xzvf build_artifacts.tar.gz
+
+      - name: Setup Ubuntu
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip python3-ply python3-distutils python3-pyelftools libpython3-dev swig
+
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          overprovision-lvm: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Restore Build Directory
+        run: |
+          cp -r output/build_dir ./
+          cp -r output/staging_dir ./
+
+      - name: Update Feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Continue Build
+        run: |
+          # 根据需要修改编译命令
+          make defconfig
+          make -j$(nproc) 'IGNORE_ERRORS=n m'
+
+          # 设置环境变量
+          echo "DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+          echo "HASH=$(git log -1 --format="%H")" >> $GITHUB_ENV
+
+      - name: Install GitHub CLI
+        run: |
+          type -p curl >/dev/null || sudo apt install curl -y
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Delete Secondary Build Tag
+        run: gh release delete "secondary-build-${{ env.DATE }}" --yes || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release for Secondary Build
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          allowUpdates: true
+          commit: ${{ env.HASH }}
+          name: "Secondary Build OpenWrt ${{ env.DATE }}"
+          tag: "secondary-build-${{ env.DATE }}"
+          replacesArtifacts: true
+          prerelease: true
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          artifacts: "bin/targets/rockchip/armv8/*"
