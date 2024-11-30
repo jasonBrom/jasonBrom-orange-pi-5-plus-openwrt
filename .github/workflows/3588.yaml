@@ -58,7 +58,7 @@ jobs:
                 git apply 01-key.patch
                 make download -j32
                 rm 01-key.patch
-                make -j$(nproc) 'IGNORE_ERRORS=n m'
+                make V=s -j8
                 rm -rf bin/targets/rockchip/armv8/packages
                 echo "DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
                 echo "HASH=$(git log -1 --format="%H")" >> $GITHUB_ENV
