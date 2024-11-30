@@ -690,3 +690,4 @@ CONFIG_shadow-all=y
 # CONFIG_TARGET_DEVICE_rockchip_armv8_DEVICE_firefly_roc-rk3328-cc is not set
 # CONFIG_TARGET_DEVICE_rockchip_armv8_DEVICE_friendlyarm_nanopi-neo3 is not set
 # CONFIG_TARGET_DEVICE_rockchip_armv8_DEVICE_pine64_rockpro64 is not set
+
