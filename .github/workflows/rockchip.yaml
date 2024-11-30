@@ -92,24 +92,6 @@ jobs:
           echo "DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
           echo "HASH=$(git log -1 --format="%H")" >> $GITHUB_ENV
 
-      - name: 压缩编译产物
-        run: |
-          mkdir -p output
-          cp -r build_dir output/
-          cp -r staging_dir output/
-          tar -czvf build_artifacts.tar.gz output
-
-          # 检查压缩文件大小是否超过 2GB
-          FILE_SIZE=$(stat -c%s "build_artifacts.tar.gz")
-          MAX_SIZE=$((2 * 1024 * 1024 * 1024)) # 2GB in bytes
-
-          if [ $FILE_SIZE -gt $MAX_SIZE ]; then
-            echo "压缩后的文件大小为 $(($FILE_SIZE / (1024 * 1024))) MB，超过了 2GB，已删除该文件。"
-            rm build_artifacts.tar.gz
-          else
-            echo "压缩后的文件大小为 $(($FILE_SIZE / (1024 * 1024))) MB，未超过 2GB。"
-          fi
-
       - name: Delete tag
         run: gh release delete linux-6.12.y --cleanup-tag || true
         env:
